@@ -18,7 +18,6 @@ The key features of the Recipe Discovery repository include:
 - Spring Boot: A Java-based framework used to develop enterprise-grade applications with ease.
 - Elasticsearch: A distributed, RESTful search and analytics engine used for efficient recipe search and retrieval.
 - Redis: An open-source in-memory data structure store used for caching and improving performance.
-- Neo4j: A graph database that enables efficient storage and retrieval of interconnected data, helpful for modeling relationships between recipes, ingredients, and user preferences.
   
 ## Getting Started
 
