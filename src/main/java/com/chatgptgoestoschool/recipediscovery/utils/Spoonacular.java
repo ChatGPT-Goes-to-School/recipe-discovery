@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -21,16 +22,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class Spoonacular {
+  @Value("${SPOONACULAR_API}")
+  private String apiKey;
 
   public List<Recipe> searchRecipes(String query)
       throws JSONException, IOException, InterruptedException {
     var params = new HashMap<String, String>();
     params.put("text", query);
 
-    HttpRequest request = HttpRequest.newBuilder()
-        .uri(URI.create("https://api.spoonacular.com/food/detect"))
-        .header("x-api-key", "2e10b27e8eb44dc89bf4f46ff05552ed").POST(getParamsUrlEncoded(params))
-        .headers("Content-Type", "application/x-www-form-urlencoded").build();
+    HttpRequest request =
+        HttpRequest.newBuilder().uri(URI.create("https://api.spoonacular.com/food/detect"))
+            .header("x-api-key", apiKey).POST(getParamsUrlEncoded(params))
+            .headers("Content-Type", "application/x-www-form-urlencoded").build();
     HttpResponse<String> response =
         HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
