@@ -24,4 +24,14 @@ public class Recipe {
 
   @JsonProperty("image")
   public String image;
+
+  @JsonProperty("views")
+  public int views;
+
+  @JsonProperty("positive")
+  public int positive;
+
+  @JsonProperty("negative")
+  public int negative;
+
 }
