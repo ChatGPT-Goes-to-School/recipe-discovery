@@ -24,5 +24,4 @@ public class Recipe {
 
   @JsonProperty("image")
   public String image;
-
 }
