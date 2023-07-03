@@ -14,7 +14,8 @@ public class JWT {
   private String secret;
 
   public Jws<Claims> decodeToken(String token) {
+    String auth = token.replace("Bearer ", "");
     Key key = Keys.hmacShaKeyFor(secret.getBytes());
-    return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+    return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(auth);
   }
 }
