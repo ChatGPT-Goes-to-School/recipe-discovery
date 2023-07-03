@@ -1,8 +1,11 @@
 package com.chatgptgoestoschool.recipediscovery.service;
 
+import java.io.IOException;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.stereotype.Service;
+import com.chatgptgoestoschool.recipediscovery.exception.JSONHandlingException;
 import com.chatgptgoestoschool.recipediscovery.exception.RecipeNotFoundException;
 import com.chatgptgoestoschool.recipediscovery.exception.RecipeNotOwnedException;
 import com.chatgptgoestoschool.recipediscovery.model.Recipe;
@@ -23,63 +26,52 @@ public class RecipeService {
   @Autowired
   private JWT jwtUtils;
 
-  public List<Recipe> searchRecipe(String keyword) {
+  public List<Recipe> searchRecipe(String keyword) throws JSONHandlingException {
     try {
       List<Recipe> recipes = spoonacular.searchRecipes(keyword);
       recipeRepository.saveAll(recipes);
-    } catch (Exception ex) {
-      System.out.println("An error occured " + ex.getMessage());
+    } catch (JSONException | IOException | InterruptedException ex) {
+      throw new JSONHandlingException(ex.getMessage());
     }
+
     return recipeRepository.searchRecipes(keyword);
   }
 
   public Recipe addRecipe(Recipe recipe) {
-    try {
-      return recipeRepository.save(recipe);
-    } catch (Exception ex) {
-      System.out.println("An error occured " + ex.getMessage());
-      return null;
-    }
+    return recipeRepository.save(recipe);
   }
 
-  public Recipe updateRecipe(Recipe recipe, String token) {
-    try {
-      Recipe oldRecipe = recipeRepository.findById(recipe.id).orElse(null);
+  public Recipe updateRecipe(Recipe recipe, String token)
+      throws RecipeNotFoundException, RecipeNotOwnedException {
+    Recipe oldRecipe = recipeRepository.findById(recipe.id).orElse(null);
 
-      if (oldRecipe == null) {
-        throw new RecipeNotFoundException(" Recipe can't be found");
-      }
-
-      if (!validateOwner(recipe.owner, token)) {
-        throw new RecipeNotOwnedException("Recipe is not owned by the user");
-      }
-
-      oldRecipe.name = recipe.name;
-      oldRecipe.image = recipe.image;
-      oldRecipe.tag = recipe.tag;
-      return recipeRepository.save(oldRecipe);
-    } catch (Exception ex) {
-      System.out.println("An error occured " + ex.getMessage());
-      return null;
+    if (oldRecipe == null) {
+      throw new RecipeNotFoundException(" Recipe can't be found");
     }
+
+    if (!validateOwner(recipe.owner, token)) {
+      throw new RecipeNotOwnedException("Recipe is not owned by the user");
+    }
+
+    oldRecipe.name = recipe.name;
+    oldRecipe.image = recipe.image;
+    oldRecipe.tag = recipe.tag;
+    return recipeRepository.save(oldRecipe);
   }
 
-  public void deleteRecipe(String id, String token) {
-    try {
-      Recipe recipe = recipeRepository.findById(id).orElse(null);
+  public void deleteRecipe(String id, String token)
+      throws RecipeNotFoundException, RecipeNotOwnedException {
+    Recipe recipe = recipeRepository.findById(id).orElse(null);
 
-      if (recipe == null) {
-        throw new RecipeNotFoundException(" Recipe can't be found");
-      }
-
-      if (!validateOwner(recipe.owner, token)) {
-        throw new RecipeNotOwnedException("Recipe is not owned by the user");
-      }
-
-      recipeRepository.delete(recipe);
-    } catch (Exception ex) {
-      System.out.println("An error occured " + ex.getMessage());
+    if (recipe == null) {
+      throw new RecipeNotFoundException(" Recipe can't be found");
     }
+
+    if (!validateOwner(recipe.owner, token)) {
+      throw new RecipeNotOwnedException("Recipe is not owned by the user");
+    }
+
+    recipeRepository.delete(recipe);
   }
 
   public boolean validateOwner(String id, String token) {
@@ -94,58 +86,45 @@ public class RecipeService {
     }
   }
 
-  public void incrementView(String id) {
-    try {
-      Recipe recipe = recipeRepository.findById(id).orElse(null);
+  public void incrementView(String id) throws RecipeNotFoundException {
+    Recipe recipe = recipeRepository.findById(id).orElse(null);
 
-      if (recipe == null) {
-        throw new RecipeNotFoundException(" Recipe can't be found");
-      }
-
-      recipe.views += 1;
-      recipeRepository.save(recipe);
-    } catch (Exception ex) {
-      System.out.println("An error occured " + ex.getMessage());
+    if (recipe == null) {
+      throw new RecipeNotFoundException(" Recipe can't be found");
     }
+
+    recipe.views += 1;
+    recipeRepository.save(recipe);
+
   }
 
-  public void updatePositive(String id, boolean isIncrement) {
-    try {
-      Recipe recipe = recipeRepository.findById(id).orElse(null);
+  public void updatePositive(String id, boolean isIncrement) throws RecipeNotFoundException {
+    Recipe recipe = recipeRepository.findById(id).orElse(null);
 
-      if (recipe == null) {
-        throw new RecipeNotFoundException(" Recipe can't be found");
-      }
-
-      if (isIncrement)
-        recipe.positive += 1;
-      else
-        recipe.positive -= 1;
-
-      recipeRepository.save(recipe);
-    } catch (Exception ex) {
-      System.out.println("An error occured " + ex.getMessage());
+    if (recipe == null) {
+      throw new RecipeNotFoundException(" Recipe can't be found");
     }
+
+    if (isIncrement)
+      recipe.positive += 1;
+    else
+      recipe.positive -= 1;
+
+    recipeRepository.save(recipe);
   }
 
-  public void updateNegative(String id, boolean isIncrement) {
-    try {
-      Recipe recipe = recipeRepository.findById(id).orElse(null);
+  public void updateNegative(String id, boolean isIncrement) throws RecipeNotFoundException {
+    Recipe recipe = recipeRepository.findById(id).orElse(null);
 
-      if (recipe == null) {
-        throw new RecipeNotFoundException(" Recipe can't be found");
-      }
-
-      if (isIncrement)
-        recipe.negative += 1;
-      else
-        recipe.negative -= 1;
-
-      recipeRepository.save(recipe);
-    } catch (Exception ex) {
-      System.out.println("An error occured " + ex.getMessage());
+    if (recipe == null) {
+      throw new RecipeNotFoundException(" Recipe can't be found");
     }
+
+    if (isIncrement)
+      recipe.negative += 1;
+    else
+      recipe.negative -= 1;
+
+    recipeRepository.save(recipe);
   }
-
-
 }
