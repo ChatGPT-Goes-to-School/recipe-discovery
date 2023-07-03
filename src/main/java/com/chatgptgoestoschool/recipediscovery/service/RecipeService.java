@@ -4,9 +4,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.chatgptgoestoschool.recipediscovery.exception.RecipeNotFoundException;
+import com.chatgptgoestoschool.recipediscovery.exception.RecipeNotOwnedException;
 import com.chatgptgoestoschool.recipediscovery.model.Recipe;
 import com.chatgptgoestoschool.recipediscovery.repository.RecipeRepository;
+import com.chatgptgoestoschool.recipediscovery.utils.JWT;
 import com.chatgptgoestoschool.recipediscovery.utils.Spoonacular;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 
 @Service
 public class RecipeService {
@@ -16,6 +20,8 @@ public class RecipeService {
   @Autowired
   private Spoonacular spoonacular;
 
+  @Autowired
+  private JWT jwtUtils;
 
   public List<Recipe> searchRecipe(String keyword) {
     try {
@@ -36,12 +42,16 @@ public class RecipeService {
     }
   }
 
-  public Recipe updateRecipe(Recipe recipe) {
+  public Recipe updateRecipe(Recipe recipe, String token) {
     try {
       Recipe oldRecipe = recipeRepository.findById(recipe.id).orElse(null);
 
       if (oldRecipe == null) {
         throw new RecipeNotFoundException(" Recipe can't be found");
+      }
+
+      if (!validateOwner(recipe.owner, token)) {
+        throw new RecipeNotOwnedException("Recipe is not owned by the user");
       }
 
       oldRecipe.name = recipe.name;
@@ -51,6 +61,36 @@ public class RecipeService {
     } catch (Exception ex) {
       System.out.println("An error occured " + ex.getMessage());
       return null;
+    }
+  }
+
+  public void deleteRecipe(String id, String token) {
+    try {
+      Recipe recipe = recipeRepository.findById(id).orElse(null);
+
+      if (recipe == null) {
+        throw new RecipeNotFoundException(" Recipe can't be found");
+      }
+
+      if (!validateOwner(recipe.owner, token)) {
+        throw new RecipeNotOwnedException("Recipe is not owned by the user");
+      }
+
+      recipeRepository.delete(recipe);
+    } catch (Exception ex) {
+      System.out.println("An error occured " + ex.getMessage());
+    }
+  }
+
+  public boolean validateOwner(String id, String token) {
+    try {
+      Jws<Claims> claims = jwtUtils.decodeToken(token);
+      String uid = claims.getBody().get("userId").toString();
+
+      return id.equals(uid);
+    } catch (Exception ex) {
+      System.out.println("An error occured " + ex.getMessage());
+      return false;
     }
   }
 
@@ -107,17 +147,5 @@ public class RecipeService {
     }
   }
 
-  public void deleteRecipe(String id) {
-    try {
-      Recipe recipe = recipeRepository.findById(id).orElse(null);
 
-      if (recipe == null) {
-        throw new RecipeNotFoundException(" Recipe can't be found");
-      }
-
-      recipeRepository.delete(recipe);
-    } catch (Exception ex) {
-      System.out.println("An error occured " + ex.getMessage());
-    }
-  }
 }

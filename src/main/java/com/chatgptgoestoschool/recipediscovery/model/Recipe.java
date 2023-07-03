@@ -34,4 +34,6 @@ public class Recipe {
   @JsonProperty("negative")
   public int negative;
 
+  @JsonProperty("owner")
+  public String owner;
 }
