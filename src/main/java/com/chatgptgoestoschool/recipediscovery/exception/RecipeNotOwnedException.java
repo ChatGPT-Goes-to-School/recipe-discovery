@@ -10,4 +10,8 @@ public class RecipeNotOwnedException extends Exception {
   public String getMessage() {
     return "Error with status code " + status + ", with message " + super.getMessage();
   }
+
+  public int getStatus() {
+    return status;
+  }
 }
