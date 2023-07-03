@@ -1,9 +1,9 @@
 package com.chatgptgoestoschool.recipediscovery.exception;
 
-public class RecipeNotFoundException extends Exception {
+public class RecipeNotOwnedException extends Exception {
   private int status = 400;
 
-  public RecipeNotFoundException(String message) {
+  public RecipeNotOwnedException(String message) {
     super(message);
   }
 
