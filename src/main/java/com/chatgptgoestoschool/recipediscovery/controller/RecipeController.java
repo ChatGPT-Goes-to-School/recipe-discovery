@@ -9,19 +9,23 @@ import com.chatgptgoestoschool.recipediscovery.exception.RecipeNotFoundException
 import com.chatgptgoestoschool.recipediscovery.exception.RecipeNotOwnedException;
 import com.chatgptgoestoschool.recipediscovery.model.Recipe;
 import com.chatgptgoestoschool.recipediscovery.service.RecipeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-
-@Controller("/recipe")
+@RestController
+@RequestMapping("/recipe")
+@RequiredArgsConstructor
 public class RecipeController {
   @Autowired
-  private RecipeService recipeService;
+  private final RecipeService recipeService;
 
   @GetMapping
   public ResponseEntity<List<Recipe>> getRecipes(@RequestParam String keyword)

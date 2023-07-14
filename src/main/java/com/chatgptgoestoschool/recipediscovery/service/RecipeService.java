@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.chatgptgoestoschool.recipediscovery.exception.JSONHandlingException;
 import com.chatgptgoestoschool.recipediscovery.exception.RecipeNotFoundException;
 import com.chatgptgoestoschool.recipediscovery.exception.RecipeNotOwnedException;
@@ -14,17 +15,22 @@ import com.chatgptgoestoschool.recipediscovery.utils.JWT;
 import com.chatgptgoestoschool.recipediscovery.utils.Spoonacular;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Transactional
+@Slf4j
+@RequiredArgsConstructor
 public class RecipeService {
   @Autowired
-  private RecipeRepository recipeRepository;
+  private final RecipeRepository recipeRepository;
 
   @Autowired
-  private Spoonacular spoonacular;
+  private final Spoonacular spoonacular;
 
   @Autowired
-  private JWT jwtUtils;
+  private final JWT jwtUtils;
 
   public List<Recipe> searchRecipe(String keyword) throws JSONHandlingException {
     try {
