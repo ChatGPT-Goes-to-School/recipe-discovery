@@ -10,7 +10,7 @@ import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JWT {
-  @Value("${JWT_SECRET}")
+  @Value("${jwt.secret}")
   private String secret;
 
   public Jws<Claims> decodeToken(String token) {

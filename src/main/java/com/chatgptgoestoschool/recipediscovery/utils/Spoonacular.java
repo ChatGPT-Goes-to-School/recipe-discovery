@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class Spoonacular {
-  @Value("${SPOONACULAR_API}")
+  @Value("${spoonacular.api}")
   private String apiKey;
 
   public List<Recipe> searchRecipes(String query)

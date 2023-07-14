@@ -7,11 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.chatgptgoestoschool.recipediscovery.model.Collection;
 import com.chatgptgoestoschool.recipediscovery.repository.CollectionRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
-@Slf4j
 @RequiredArgsConstructor
 public class CollectionService {
   @Autowired
