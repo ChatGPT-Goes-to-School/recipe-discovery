@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import com.chatgptgoestoschool.recipediscovery.exception.JSONHandlingException;
 import com.chatgptgoestoschool.recipediscovery.exception.RecipeNotFoundException;
 import com.chatgptgoestoschool.recipediscovery.exception.RecipeNotOwnedException;
@@ -29,6 +30,9 @@ public class RecipeService {
   private final Spoonacular spoonacular;
 
   @Autowired
+  private final S3Service s3Service;
+
+  @Autowired
   private final JWT jwtUtils;
 
   public List<Recipe> searchRecipe(String keyword) throws JSONHandlingException {
@@ -42,7 +46,16 @@ public class RecipeService {
     return recipeRepository.searchRecipes(keyword);
   }
 
-  public Recipe addRecipe(Recipe recipe) {
+  public Recipe addRecipe(Recipe recipe, MultipartFile file) {
+    String url = s3Service.putObject(recipe.id, file);
+    recipe.image = url;
+    return recipeRepository.save(recipe);
+  }
+
+  public Recipe updateImage(Recipe recipe, MultipartFile file) {
+    s3Service.deleteObject(recipe.id);
+    String url = s3Service.putObject(recipe.id, file);
+    recipe.image = url;
     return recipeRepository.save(recipe);
   }
 
@@ -76,6 +89,7 @@ public class RecipeService {
       throw new RecipeNotOwnedException("Recipe is not owned by the user");
     }
 
+    s3Service.deleteObject(id);
     recipeRepository.delete(recipe);
   }
 

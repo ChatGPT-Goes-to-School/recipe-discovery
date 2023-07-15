@@ -16,41 +16,32 @@ import com.chatgptgoestoschool.recipediscovery.configuration.AwsS3Config;
 
 @Service
 @Transactional
-public class S3Sevice {
+public class S3Service {
   @Value("${aws.s3.bucket.name}")
   private String bucketName;
   private final AmazonS3 client;
 
-  public S3Sevice(AwsS3Config config) {
+  public S3Service(AwsS3Config config) {
     client = config.amazonS3();
   }
 
-  public void putObject(String bucketName, BucketObjectRepresentaion representation,
-      boolean publicObject) throws IOException {
-
-    String objectName = representation.getObjectName();
-    String objectValue = representation.getText();
-
-    File file = new File("." + File.separator + objectName);
-    FileWriter fileWriter = new FileWriter(file, false);
-    PrintWriter printWriter = new PrintWriter(fileWriter);
-    printWriter.println(objectValue);
-    printWriter.flush();
-    printWriter.close();
+  public String putObject(String filename, MultipartFile file) {
+    ObjectMetadata md = new ObjectMetadata();
+    md.setContentLength(file.getSize());
+    md.setContentType(file.getContentType());
 
     try {
-      var putObjectRequest = new PutObjectRequest(bucketName, objectName, file)
+      var putObjectRequest = new PutObjectRequest(bucketName, filename, file.getInputStream(), md)
           .withCannedAcl(CannedAccessControlList.PublicRead);
       client.putObject(putObjectRequest);
-    } catch (Exception e) {
-      e.printStackTrace();
-    } finally {
-      file.delete();
-    }
+      return client.getUrl(bucketName, filename).toExternalForm();
 
+    } catch (IOException ioException) {
+      throw new RuntimeException(ioException);
+    }
   }
 
-  public void deleteObject(String bucketName, String objectName) {
+  public void deleteObject(String objectName) {
     client.deleteObject(bucketName, objectName);
   }
 }
