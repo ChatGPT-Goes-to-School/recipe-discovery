@@ -3,6 +3,7 @@ package com.chatgptgoestoschool.recipediscovery.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -10,14 +11,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(indexName = "recipe")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Recipe {
   @JsonProperty("id")
   @Id
   public String id;
 
-  @JsonProperty("name")
+  @JsonProperty("title")
   @JsonAlias("annotation")
-  public String name;
+  public String title;
 
   @JsonProperty(value = "tag", access = JsonProperty.Access.WRITE_ONLY)
   public String tag;

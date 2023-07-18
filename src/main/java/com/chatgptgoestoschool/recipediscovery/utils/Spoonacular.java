@@ -32,12 +32,11 @@ public class Spoonacular {
 
     HttpRequest request = HttpRequest.newBuilder()
         .uri(URI.create("https://api.spoonacular.com/recipes/complexSearch?query=" + query))
-        .header("x-api-key", apiKey).GET()
-        .headers("Content-Type", "application/x-www-form-urlencoded").build();
+        .header("x-api-key", apiKey).GET().headers("Content-Type", "application/json").build();
     HttpResponse<String> response =
         HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
-    JSONArray food = new JSONObject(response.body()).getJSONArray("annotations");
+    JSONArray food = new JSONObject(response.body()).getJSONArray("results");
     List<Recipe> ans = new ArrayList<>();
     ObjectMapper mapper = new ObjectMapper();
     for (int i = 0; !food.isNull(i); i++)

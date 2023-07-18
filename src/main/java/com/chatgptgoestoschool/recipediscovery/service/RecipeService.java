@@ -73,7 +73,7 @@ public class RecipeService {
       throw new RecipeNotOwnedException("Recipe is not owned by the user");
     }
 
-    oldRecipe.name = recipe.name;
+    oldRecipe.title = recipe.title;
     oldRecipe.image = recipe.image;
     oldRecipe.tag = recipe.tag;
     return recipeRepository.save(oldRecipe);
