@@ -28,7 +28,7 @@ public class RecipeController {
   @Autowired
   private final RecipeService recipeService;
 
-  @GetMapping
+  @GetMapping("/search")
   public ResponseEntity<List<Recipe>> getRecipes(@RequestParam String keyword)
       throws JSONHandlingException {
     List<Recipe> recipes = recipeService.searchRecipe(keyword);
@@ -58,5 +58,10 @@ public class RecipeController {
       @RequestParam(value = "imageFile", required = false) MultipartFile image,
       @RequestBody Recipe recipe) {
     return recipeService.updateImage(recipe, image);
+  }
+
+  @GetMapping
+  public Recipe getRecipe(@RequestParam String id) throws RecipeNotFoundException {
+    return recipeService.getRecipe(id);
   }
 }

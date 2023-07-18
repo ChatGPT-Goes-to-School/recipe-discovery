@@ -48,6 +48,10 @@ public class RecipeService {
     return recipeRepository.searchRecipes(keyword);
   }
 
+  public Recipe getRecipe(String id) {
+    return recipeRepository.findById(id).orElse(null);
+  }
+
   public Recipe addRecipe(Recipe recipe, MultipartFile file) {
     String url = s3Service.putObject(recipe.id, file);
     recipe.image = url;
