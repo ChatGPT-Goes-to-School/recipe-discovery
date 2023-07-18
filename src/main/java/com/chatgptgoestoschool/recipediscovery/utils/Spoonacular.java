@@ -30,10 +30,10 @@ public class Spoonacular {
     var params = new HashMap<String, String>();
     params.put("text", query);
 
-    HttpRequest request =
-        HttpRequest.newBuilder().uri(URI.create("https://api.spoonacular.com/food/detect"))
-            .header("x-api-key", apiKey).POST(getParamsUrlEncoded(params))
-            .headers("Content-Type", "application/x-www-form-urlencoded").build();
+    HttpRequest request = HttpRequest.newBuilder()
+        .uri(URI.create("https://api.spoonacular.com/recipes/complexSearch?query=" + query))
+        .header("x-api-key", apiKey).GET()
+        .headers("Content-Type", "application/x-www-form-urlencoded").build();
     HttpResponse<String> response =
         HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 

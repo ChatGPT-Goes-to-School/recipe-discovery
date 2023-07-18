@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class RecipeService {
   @Autowired
   private final RecipeRepository recipeRepository;
@@ -38,6 +39,7 @@ public class RecipeService {
   public List<Recipe> searchRecipe(String keyword) throws JSONHandlingException {
     try {
       List<Recipe> recipes = spoonacular.searchRecipes(keyword);
+      log.info("Recipes: " + recipes);
       recipeRepository.saveAll(recipes);
     } catch (JSONException | IOException | InterruptedException ex) {
       throw new JSONHandlingException(ex.getMessage());
